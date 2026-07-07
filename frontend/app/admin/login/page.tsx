@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import Logo from "@/components/Logo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -34,7 +35,8 @@ export default function LoginPage() {
 
   return (
     <div className="mx-auto flex max-w-sm flex-col justify-center px-6 py-20">
-      <h1 className="text-2xl font-bold text-gray-900">Panel admin</h1>
+      <Logo />
+      <h1 className="mt-6 text-2xl font-bold text-gray-900">Panel admin</h1>
       <p className="mt-1 text-sm text-gray-600">
         Inicia sesion para gestionar el catalogo.
       </p>

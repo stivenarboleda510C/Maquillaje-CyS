@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import LogoutButton from "@/components/admin/LogoutButton";
+import Logo from "@/components/Logo";
 
 export default async function AdminLayout({
   children,
@@ -19,8 +20,8 @@ export default async function AdminLayout({
     <div className="min-h-screen bg-gray-50">
       <header className="border-b border-gray-200 bg-white">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <Link href="/admin" className="text-lg font-bold text-gray-900">
-            Panel admin - Maquillaje CyS
+          <Link href="/admin">
+            <Logo />
           </Link>
           <div className="flex items-center gap-4 text-sm text-gray-600">
             <span>{data.user.email}</span>
