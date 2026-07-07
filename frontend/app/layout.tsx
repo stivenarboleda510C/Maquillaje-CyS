@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Header from "@/components/Header";
+import WhatsappButton from "@/components/WhatsappButton";
 import { CartProvider } from "@/lib/cart/CartContext";
 import "./globals.css";
 
@@ -33,6 +34,7 @@ export default function RootLayout({
         <CartProvider>
           <Header />
           <main className="flex-1">{children}</main>
+          <WhatsappButton />
         </CartProvider>
       </body>
     </html>
