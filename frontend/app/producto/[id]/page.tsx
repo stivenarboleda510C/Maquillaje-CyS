@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getProduct } from "@/lib/api";
+import AddToCartButton from "@/components/AddToCartButton";
 
 export default async function Page({
   params,
@@ -45,6 +46,7 @@ export default async function Page({
               ? `${product.stock} unidades disponibles`
               : "Sin stock por el momento"}
           </p>
+          <AddToCartButton product={product} />
         </div>
       </div>
     </div>

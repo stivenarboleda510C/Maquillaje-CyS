@@ -27,10 +27,20 @@ def root():
 
 
 @app.get("/products", response_model=list[Product])
-def list_products(category: str | None = None):
+def list_products(
+    category: str | None = None,
+    search: str | None = None,
+    sort: str | None = None,
+):
     query = supabase.table("products").select("*")
     if category:
         query = query.eq("category", category)
+    if search:
+        query = query.ilike("name", f"%{search}%")
+    if sort == "price_asc":
+        query = query.order("price")
+    elif sort == "price_desc":
+        query = query.order("price", desc=True)
     result = query.execute()
     return result.data
 

@@ -10,9 +10,15 @@ export type Product = {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
-export async function getProducts(category?: string): Promise<Product[]> {
+export async function getProducts(filters?: {
+  category?: string;
+  search?: string;
+  sort?: string;
+}): Promise<Product[]> {
   const url = new URL("/products", API_URL);
-  if (category) url.searchParams.set("category", category);
+  if (filters?.category) url.searchParams.set("category", filters.category);
+  if (filters?.search) url.searchParams.set("search", filters.search);
+  if (filters?.sort) url.searchParams.set("sort", filters.sort);
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error("No se pudieron cargar los productos");
   return res.json();

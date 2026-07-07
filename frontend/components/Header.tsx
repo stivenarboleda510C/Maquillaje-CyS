@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
+import CartBadge from "@/components/CartBadge";
 
 export default function Header() {
   return (
@@ -8,10 +9,11 @@ export default function Header() {
         <Link href="/">
           <Logo />
         </Link>
-        <nav className="text-sm font-medium text-gray-600">
+        <nav className="flex items-center gap-6 text-sm font-medium text-gray-600">
           <Link href="/" className="hover:text-pink-600">
             Catalogo
           </Link>
+          <CartBadge />
         </nav>
       </div>
     </header>
