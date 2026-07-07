@@ -12,9 +12,5 @@ class ProductBase(BaseModel):
     stock: int = 0
 
 
-class ProductCreate(ProductBase):
-    pass
-
-
 class Product(ProductBase):
     id: int

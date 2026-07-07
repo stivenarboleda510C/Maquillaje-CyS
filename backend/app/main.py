@@ -5,7 +5,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import supabase
-from app.schemas import Product, ProductCreate
+from app.schemas import Product
 
 load_dotenv()
 
@@ -40,12 +40,6 @@ def get_product(product_id: int):
     result = supabase.table("products").select("*").eq("id", product_id).execute()
     if not result.data:
         raise HTTPException(status_code=404, detail="Producto no encontrado")
-    return result.data[0]
-
-
-@app.post("/products", response_model=Product)
-def create_product(product: ProductCreate):
-    result = supabase.table("products").insert(product.model_dump()).execute()
     return result.data[0]
 
 
