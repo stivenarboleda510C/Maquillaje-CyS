@@ -4,14 +4,17 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const NAV_ITEMS = [
-  { href: "/admin", label: "Productos" },
-  { href: "/admin/cuenta", label: "Cambiar contrasena" },
-];
-
-export default function AdminSidebar() {
+export default function AdminSidebar({ role }: { role: string }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+
+  const navItems = [
+    { href: "/admin", label: "Productos" },
+    { href: "/admin/cuenta", label: "Cambiar contrasena" },
+    ...(role === "admin"
+      ? [{ href: "/admin/usuarios", label: "Usuarios" }]
+      : []),
+  ];
 
   return (
     <>
@@ -54,7 +57,7 @@ export default function AdminSidebar() {
                 ✕
               </button>
             </div>
-            {NAV_ITEMS.map((item) => (
+            {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
