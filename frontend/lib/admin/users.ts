@@ -31,6 +31,11 @@ export async function inviteUser(
   role: "admin" | "empleado",
   redirectTo: string
 ) {
+  const existing = await listUsers();
+  if (existing.some((user) => user.email?.toLowerCase() === email.toLowerCase())) {
+    throw new Error("Ya existe una cuenta con ese email.");
+  }
+
   const supabase = createAdminClient();
   const { data, error } = await supabase.auth.admin.inviteUserByEmail(email, {
     redirectTo,
