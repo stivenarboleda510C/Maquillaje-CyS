@@ -15,7 +15,19 @@ export default async function UsersPage() {
     throw error;
   }
 
-  const users = await listUsers();
+  let users;
+  try {
+    users = await listUsers();
+  } catch (error) {
+    return (
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Usuarios</h1>
+        <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error instanceof Error ? error.message : "Error desconocido"}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div>
