@@ -11,6 +11,7 @@ export default function AdminSidebar({ role }: { role: string }) {
   const router = useRouter();
 
   async function handleLogout() {
+    if (!confirm("Estas seguro de cerrar la sesion?")) return;
     const supabase = createClient();
     await supabase.auth.signOut();
     router.push("/admin/login");
