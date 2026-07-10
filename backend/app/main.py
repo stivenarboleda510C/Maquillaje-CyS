@@ -26,15 +26,25 @@ def root():
     return {"status": "ok", "service": "Maquillaje CyS API"}
 
 
+def _flatten_category_fields(product: dict) -> dict:
+    category = product.get("category")
+    subcategory = product.get("subcategory")
+    product["category"] = category["name"] if category else None
+    product["subcategory"] = subcategory["name"] if subcategory else None
+    return product
+
+
+PRODUCT_SELECT = "*, category:categories(name), subcategory:subcategories(name)"
+
+
 @app.get("/products", response_model=list[Product])
 def list_products(
     category: str | None = None,
+    subcategory: str | None = None,
     search: str | None = None,
     sort: str | None = None,
 ):
-    query = supabase.table("products").select("*")
-    if category:
-        query = query.eq("category", category)
+    query = supabase.table("products").select(PRODUCT_SELECT)
     if search:
         query = query.ilike("name", f"%{search}%")
     if sort == "price_asc":
@@ -42,19 +52,33 @@ def list_products(
     elif sort == "price_desc":
         query = query.order("price", desc=True)
     result = query.execute()
-    return result.data
+    products = [_flatten_category_fields(p) for p in result.data]
+    if category:
+        products = [p for p in products if p["category"] == category]
+    if subcategory:
+        products = [p for p in products if p["subcategory"] == subcategory]
+    return products
 
 
 @app.get("/products/{product_id}", response_model=Product)
 def get_product(product_id: int):
-    result = supabase.table("products").select("*").eq("id", product_id).execute()
+    result = (
+        supabase.table("products")
+        .select(PRODUCT_SELECT)
+        .eq("id", product_id)
+        .execute()
+    )
     if not result.data:
         raise HTTPException(status_code=404, detail="Producto no encontrado")
-    return result.data[0]
+    return _flatten_category_fields(result.data[0])
 
 
 @app.get("/categories")
 def list_categories():
-    result = supabase.table("products").select("category").execute()
-    categories = sorted({row["category"] for row in result.data if row["category"]})
-    return categories
+    result = (
+        supabase.table("categories")
+        .select("id, name, subcategories(id, name)")
+        .order("name")
+        .execute()
+    )
+    return result.data

@@ -3,22 +3,36 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import type { Product } from "@/lib/api";
+import type { CategoryWithSubcategories, Product } from "@/lib/api";
 
 export default function ProductForm({
   product,
+  categories,
 }: {
   product?: Product;
+  categories: CategoryWithSubcategories[];
 }) {
   const router = useRouter();
   const [name, setName] = useState(product?.name ?? "");
   const [description, setDescription] = useState(product?.description ?? "");
   const [price, setPrice] = useState(product?.price?.toString() ?? "");
-  const [category, setCategory] = useState(product?.category ?? "");
   const [stock, setStock] = useState(product?.stock?.toString() ?? "0");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const initialCategory = categories.find((c) => c.name === product?.category);
+  const [categoryId, setCategoryId] = useState(
+    initialCategory ? String(initialCategory.id) : ""
+  );
+  const initialSubcategory = initialCategory?.subcategories.find(
+    (s) => s.name === product?.subcategory
+  );
+  const [subcategoryId, setSubcategoryId] = useState(
+    initialSubcategory ? String(initialSubcategory.id) : ""
+  );
+
+  const selectedCategory = categories.find((c) => String(c.id) === categoryId);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -50,7 +64,8 @@ export default function ProductForm({
       name,
       description: description || null,
       price: parseFloat(price),
-      category: category || null,
+      category_id: categoryId ? parseInt(categoryId, 10) : null,
+      subcategory_id: subcategoryId ? parseInt(subcategoryId, 10) : null,
       stock: parseInt(stock, 10),
       image_url: imageUrl,
     };
@@ -122,16 +137,46 @@ export default function ProductForm({
         </div>
       </div>
 
-      <div>
-        <label className="text-sm font-medium text-gray-700">
-          Categoria
-        </label>
-        <input
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          placeholder="Labios, Ojos, Rostro..."
-          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-        />
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="text-sm font-medium text-gray-700">
+            Categoria
+          </label>
+          <select
+            required
+            value={categoryId}
+            onChange={(e) => {
+              setCategoryId(e.target.value);
+              setSubcategoryId("");
+            }}
+            className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+          >
+            <option value="">Elige una categoria</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="text-sm font-medium text-gray-700">
+            Subcategoria
+          </label>
+          <select
+            value={subcategoryId}
+            onChange={(e) => setSubcategoryId(e.target.value)}
+            disabled={!selectedCategory}
+            className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm disabled:bg-gray-100"
+          >
+            <option value="">Sin subcategoria</option>
+            {selectedCategory?.subcategories.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div>

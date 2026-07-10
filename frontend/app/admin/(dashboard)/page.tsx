@@ -50,6 +50,7 @@ export default async function AdminProductsPage() {
                 </td>
                 <td className="px-4 py-3 text-gray-600">
                   {product.category ?? "-"}
+                  {product.subcategory ? ` > ${product.subcategory}` : ""}
                 </td>
                 <td className="px-4 py-3 text-gray-600">
                   ${product.price.toFixed(2)}

@@ -27,9 +27,9 @@ export default async function Page({
           ) : null}
         </div>
         <div>
-          {product.category ? (
+          {product.subcategory ?? product.category ? (
             <span className="text-sm font-semibold uppercase tracking-wide text-pink-500">
-              {product.category}
+              {product.subcategory ?? product.category}
             </span>
           ) : null}
           <h1 className="mt-1 text-3xl font-bold text-gray-900">

@@ -7,13 +7,13 @@ import type { Product } from "@/lib/api";
 export default function ProductCatalog({
   products,
   initialQuery,
-  category,
+  subcategory,
   sort,
   children,
 }: {
   products: Product[];
   initialQuery?: string;
-  category?: string;
+  subcategory?: string;
   sort?: string;
   children?: React.ReactNode;
 }) {
@@ -34,8 +34,8 @@ export default function ProductCatalog({
         action="/"
         className="mt-6 flex max-w-md items-center gap-2"
       >
-        {category ? (
-          <input type="hidden" name="category" value={category} />
+        {subcategory ? (
+          <input type="hidden" name="subcategory" value={subcategory} />
         ) : null}
         {sort ? <input type="hidden" name="sort" value={sort} /> : null}
         <input

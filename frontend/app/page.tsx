@@ -3,7 +3,7 @@ import { getCategories, getProducts } from "@/lib/api";
 import ProductCatalog from "@/components/ProductCatalog";
 
 type Filters = {
-  category?: string;
+  subcategory?: string;
   q?: string;
   sort?: string;
 };
@@ -11,7 +11,7 @@ type Filters = {
 function buildQuery(filters: Filters, overrides: Filters) {
   const merged = { ...filters, ...overrides };
   const params = new URLSearchParams();
-  if (merged.category) params.set("category", merged.category);
+  if (merged.subcategory) params.set("subcategory", merged.subcategory);
   if (merged.q) params.set("q", merged.q);
   if (merged.sort) params.set("sort", merged.sort);
   const query = params.toString();
@@ -21,15 +21,19 @@ function buildQuery(filters: Filters, overrides: Filters) {
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; q?: string; sort?: string }>;
+  searchParams: Promise<{ subcategory?: string; q?: string; sort?: string }>;
 }) {
-  const { category, q, sort } = await searchParams;
-  const filters: Filters = { category, q, sort };
+  const { subcategory, q, sort } = await searchParams;
+  const filters: Filters = { subcategory, q, sort };
 
   const [products, categories] = await Promise.all([
-    getProducts({ category, search: q, sort }),
+    getProducts({ subcategory, search: q, sort }),
     getCategories(),
   ]);
+
+  const subcategoryNames = Array.from(
+    new Set(categories.flatMap((c) => c.subcategories.map((s) => s.name)))
+  ).sort();
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
@@ -43,32 +47,32 @@ export default async function Page({
       <ProductCatalog
         products={products}
         initialQuery={q}
-        category={category}
+        subcategory={subcategory}
         sort={sort}
       >
         <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap gap-2">
             <Link
-              href={buildQuery(filters, { category: undefined })}
+              href={buildQuery(filters, { subcategory: undefined })}
               className={`rounded-full px-4 py-1.5 text-sm font-medium ${
-                !category
+                !subcategory
                   ? "bg-pink-600 text-white"
                   : "bg-white text-gray-700 border border-pink-200"
               }`}
             >
               Todas
             </Link>
-            {categories.map((cat) => (
+            {subcategoryNames.map((name) => (
               <Link
-                key={cat}
-                href={buildQuery(filters, { category: cat })}
+                key={name}
+                href={buildQuery(filters, { subcategory: name })}
                 className={`rounded-full px-4 py-1.5 text-sm font-medium ${
-                  category === cat
+                  subcategory === name
                     ? "bg-pink-600 text-white"
                     : "bg-white text-gray-700 border border-pink-200"
                 }`}
               >
-                {cat}
+                {name}
               </Link>
             ))}
           </div>

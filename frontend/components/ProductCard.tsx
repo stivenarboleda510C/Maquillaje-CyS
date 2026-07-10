@@ -19,9 +19,9 @@ export default function ProductCard({ product }: { product: Product }) {
         ) : null}
       </div>
       <div className="flex flex-1 flex-col gap-1 p-4">
-        {product.category ? (
+        {product.subcategory ?? product.category ? (
           <span className="text-xs font-semibold uppercase tracking-wide text-pink-500">
-            {product.category}
+            {product.subcategory ?? product.category}
           </span>
         ) : null}
         <h2 className="font-semibold text-gray-900">{product.name}</h2>
