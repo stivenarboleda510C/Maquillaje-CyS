@@ -19,12 +19,15 @@ export default async function Header() {
           </Link>
           {!data.user ? <CartBadge /> : null}
           {data.user ? (
-            <Link
-              href="/admin"
-              className="rounded-full bg-gray-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-gray-700"
-            >
-              Panel admin
-            </Link>
+            <>
+              <span className="text-gray-500">{data.user.email}</span>
+              <Link
+                href="/admin"
+                className="rounded-full bg-gray-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-gray-700"
+              >
+                Panel admin
+              </Link>
+            </>
           ) : null}
         </nav>
       </div>

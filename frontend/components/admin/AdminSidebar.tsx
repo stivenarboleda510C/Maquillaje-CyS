@@ -2,11 +2,20 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 export default function AdminSidebar({ role }: { role: string }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function handleLogout() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/admin/login");
+    router.refresh();
+  }
 
   const navItems = [
     { href: "/admin", label: "Productos" },
@@ -70,6 +79,16 @@ export default function AdminSidebar({ role }: { role: string }) {
                 {item.label}
               </Link>
             ))}
+
+            <div className="mt-auto pt-4">
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="w-full rounded-md border border-red-500 bg-white px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+              >
+                Cerrar sesion
+              </button>
+            </div>
           </nav>
         </div>
       ) : null}
