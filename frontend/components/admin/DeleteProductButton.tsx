@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import IconButton from "@/components/admin/IconButton";
 
 export default function DeleteProductButton({
   productId,
@@ -27,12 +28,11 @@ export default function DeleteProductButton({
   }
 
   return (
-    <button
-      onClick={handleDelete}
+    <IconButton
+      variant="delete"
+      label="Borrar producto"
       disabled={loading}
-      className="text-sm font-medium text-red-600 hover:underline disabled:opacity-50"
-    >
-      {loading ? "Borrando..." : "Borrar"}
-    </button>
+      onClick={handleDelete}
+    />
   );
 }

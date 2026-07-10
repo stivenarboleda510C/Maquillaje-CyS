@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getProducts } from "@/lib/api";
 import DeleteProductButton from "@/components/admin/DeleteProductButton";
+import { EditIcon, iconButtonClass } from "@/components/admin/IconButton";
 
 export default async function AdminProductsPage() {
   const products = await getProducts();
@@ -57,12 +58,13 @@ export default async function AdminProductsPage() {
                 </td>
                 <td className="px-4 py-3 text-gray-600">{product.stock}</td>
                 <td className="px-4 py-3">
-                  <div className="flex items-center justify-end gap-3">
+                  <div className="flex items-center justify-end gap-2">
                     <Link
                       href={`/admin/productos/${product.id}/editar`}
-                      className="text-sm font-medium text-pink-600 hover:underline"
+                      aria-label="Editar producto"
+                      className={iconButtonClass("edit")}
                     >
-                      Editar
+                      <EditIcon />
                     </Link>
                     <DeleteProductButton
                       productId={product.id}
