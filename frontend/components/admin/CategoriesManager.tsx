@@ -204,9 +204,9 @@ export default function CategoriesManager({
     <div>
       {error ? <p className="mb-4 text-sm text-red-600">{error}</p> : null}
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
         <div className="rounded-xl border border-gray-200 bg-white">
-          <div className="border-b border-gray-100 px-4 py-3">
+          <div className="border-b border-gray-100 px-5 py-4">
             <h2 className="font-bold text-gray-900">Categorias</h2>
           </div>
 
@@ -215,7 +215,7 @@ export default function CategoriesManager({
               <li
                 key={category.id}
                 onClick={() => setSelectedId(category.id)}
-                className={`flex cursor-pointer items-center justify-between border-b border-gray-50 px-4 py-2.5 ${
+                className={`flex cursor-pointer items-center justify-between border-b border-gray-50 px-5 py-3.5 ${
                   selectedId === category.id ? "bg-pink-50" : "hover:bg-gray-50"
                 }`}
               >
@@ -243,7 +243,7 @@ export default function CategoriesManager({
                   </span>
                 )}
 
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2">
                   {editingCategoryId === category.id ? (
                     <button
                       type="button"
@@ -277,17 +277,17 @@ export default function CategoriesManager({
 
           <form
             onSubmit={handleCreateCategory}
-            className="flex gap-2 border-t border-gray-100 p-3"
+            className="flex gap-2 border-t border-gray-100 p-4"
           >
             <input
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
               placeholder="Nueva categoria"
-              className="flex-1 rounded-md border border-gray-300 px-3 py-1.5 text-sm"
+              className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm"
             />
             <button
               type="submit"
-              className="rounded-md bg-pink-600 px-3 py-1.5 text-sm font-semibold text-white"
+              className="rounded-md bg-pink-600 px-4 py-2 text-sm font-semibold text-white"
             >
               Agregar
             </button>
@@ -295,7 +295,7 @@ export default function CategoriesManager({
         </div>
 
         <div className="rounded-xl border border-gray-200 bg-white">
-          <div className="border-b border-gray-100 px-4 py-3">
+          <div className="border-b border-gray-100 px-5 py-4">
             <h2 className="font-bold text-gray-900">
               Subcategorias
               {selectedCategory ? ` de ${selectedCategory.name}` : ""}
@@ -303,7 +303,7 @@ export default function CategoriesManager({
           </div>
 
           {!selectedCategory ? (
-            <p className="p-4 text-sm text-gray-500">
+            <p className="p-5 text-sm text-gray-500">
               Elige una categoria de la izquierda.
             </p>
           ) : (
@@ -312,7 +312,7 @@ export default function CategoriesManager({
                 {selectedCategory.subcategories.map((sub) => (
                   <li
                     key={sub.id}
-                    className="flex items-center justify-between border-b border-gray-50 px-4 py-2.5"
+                    className="flex items-center justify-between border-b border-gray-50 px-5 py-3.5"
                   >
                     {editingSubcategoryId === sub.id ? (
                       <input
@@ -329,7 +329,7 @@ export default function CategoriesManager({
                       <span className="text-sm text-gray-700">{sub.name}</span>
                     )}
 
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-2">
                       {editingSubcategoryId === sub.id ? (
                         <button
                           type="button"
@@ -357,7 +357,7 @@ export default function CategoriesManager({
                   </li>
                 ))}
                 {selectedCategory.subcategories.length === 0 ? (
-                  <li className="px-4 py-3 text-sm text-gray-500">
+                  <li className="px-5 py-4 text-sm text-gray-500">
                     Sin subcategorias todavia.
                   </li>
                 ) : null}
@@ -365,17 +365,17 @@ export default function CategoriesManager({
 
               <form
                 onSubmit={handleCreateSubcategory}
-                className="flex gap-2 border-t border-gray-100 p-3"
+                className="flex gap-2 border-t border-gray-100 p-4"
               >
                 <input
                   value={newSubcategoryName}
                   onChange={(e) => setNewSubcategoryName(e.target.value)}
                   placeholder="Nueva subcategoria"
-                  className="flex-1 rounded-md border border-gray-300 px-3 py-1.5 text-sm"
+                  className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm"
                 />
                 <button
                   type="submit"
-                  className="rounded-md bg-pink-600 px-3 py-1.5 text-sm font-semibold text-white"
+                  className="rounded-md bg-pink-600 px-4 py-2 text-sm font-semibold text-white"
                 >
                   Agregar
                 </button>
