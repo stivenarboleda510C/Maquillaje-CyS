@@ -10,7 +10,6 @@ export default function AdminSidebar({ role }: { role: string }) {
 
   const navItems = [
     { href: "/admin", label: "Productos" },
-    { href: "/admin/cuenta", label: "Cambiar contrasena" },
     ...(role === "admin"
       ? [{ href: "/admin/usuarios", label: "Usuarios" }]
       : []),
