@@ -33,7 +33,7 @@ export default function CategoryIcons({
               className="flex flex-col items-center gap-2"
             >
               <div
-                className={`relative h-28 w-28 overflow-hidden rounded-full ${
+                className={`relative h-36 w-36 overflow-hidden rounded-full ${
                   isSelected ? "ring-2 ring-pink-600" : ""
                 }`}
               >
