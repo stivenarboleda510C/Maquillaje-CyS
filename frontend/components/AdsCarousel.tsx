@@ -24,7 +24,7 @@ export default function AdsCarousel({ ads }: { ads: Ad[] }) {
   }
 
   return (
-    <div className="relative mt-6 aspect-[3/1] w-full overflow-hidden rounded-xl bg-pink-50">
+    <div className="relative mt-6 aspect-[9/2] w-full overflow-hidden rounded-xl bg-pink-50">
       {ads.map((ad, i) => (
         <div
           key={ad.id}

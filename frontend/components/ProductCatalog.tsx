@@ -65,13 +65,13 @@ export default function ProductCatalog({
         </button>
       </form>
 
-      {children}
-
       <AdsCarousel ads={ads} />
 
       {!category ? (
         <CategoryIcons categories={categories} selected={category} />
       ) : null}
+
+      {children}
 
       {visibleProducts.length === 0 ? (
         <p className="mt-10 text-gray-500">
