@@ -17,7 +17,7 @@ export default async function Header() {
           <Link href="/" className="hover:text-pink-600">
             Catalogo
           </Link>
-          <CartBadge />
+          {!data.user ? <CartBadge /> : null}
           {data.user ? (
             <Link
               href="/admin"
