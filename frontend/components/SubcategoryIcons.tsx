@@ -22,7 +22,7 @@ export default function SubcategoryIcons({
             className="flex flex-col items-center gap-2"
           >
             <div
-              className={`flex h-16 w-16 items-center justify-center rounded-full text-xl font-bold text-white ${
+              className={`flex h-24 w-24 items-center justify-center rounded-full text-2xl font-bold text-white ${
                 isSelected ? "ring-2 ring-pink-600" : ""
               }`}
               style={{
