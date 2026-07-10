@@ -21,6 +21,7 @@ export default function AdminSidebar({ role }: { role: string }) {
   const navItems = [
     { href: "/admin", label: "Productos" },
     { href: "/admin/categorias", label: "Categorias" },
+    { href: "/admin/publicidad", label: "Publicidad" },
     ...(role === "admin"
       ? [{ href: "/admin/usuarios", label: "Usuarios" }]
       : []),

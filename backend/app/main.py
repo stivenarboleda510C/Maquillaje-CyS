@@ -82,3 +82,9 @@ def list_categories():
         .execute()
     )
     return result.data
+
+
+@app.get("/ads")
+def list_ads():
+    result = supabase.table("ads").select("*").order("sort_order").execute()
+    return result.data

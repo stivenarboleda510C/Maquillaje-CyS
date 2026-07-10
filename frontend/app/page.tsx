@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getCategories, getProducts } from "@/lib/api";
+import { getAds, getCategories, getProducts } from "@/lib/api";
 import ProductCatalog from "@/components/ProductCatalog";
 
 type Filters = {
@@ -26,9 +26,10 @@ export default async function Page({
   const { subcategory, q, sort } = await searchParams;
   const filters: Filters = { subcategory, q, sort };
 
-  const [products, categories] = await Promise.all([
+  const [products, categories, ads] = await Promise.all([
     getProducts({ subcategory, search: q, sort }),
     getCategories(),
+    getAds(),
   ]);
 
   const subcategoryNames = Array.from(
@@ -46,6 +47,7 @@ export default async function Page({
 
       <ProductCatalog
         products={products}
+        ads={ads}
         initialQuery={q}
         subcategory={subcategory}
         sort={sort}

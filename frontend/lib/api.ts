@@ -15,6 +15,12 @@ export type CategoryWithSubcategories = {
   subcategories: { id: number; name: string }[];
 };
 
+export type Ad = {
+  id: number;
+  image_url: string;
+  sort_order: number;
+};
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 export async function getProducts(filters?: {
@@ -48,5 +54,11 @@ export async function getCategories(): Promise<CategoryWithSubcategories[]> {
     cache: "no-store",
   });
   if (!res.ok) throw new Error("No se pudieron cargar las categorias");
+  return res.json();
+}
+
+export async function getAds(): Promise<Ad[]> {
+  const res = await fetch(new URL("/ads", API_URL), { cache: "no-store" });
+  if (!res.ok) throw new Error("No se pudieron cargar los banners");
   return res.json();
 }

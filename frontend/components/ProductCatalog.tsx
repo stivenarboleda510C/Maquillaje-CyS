@@ -2,16 +2,19 @@
 
 import { useMemo, useState } from "react";
 import ProductCard from "@/components/ProductCard";
-import type { Product } from "@/lib/api";
+import AdsCarousel from "@/components/AdsCarousel";
+import type { Ad, Product } from "@/lib/api";
 
 export default function ProductCatalog({
   products,
+  ads,
   initialQuery,
   subcategory,
   sort,
   children,
 }: {
   products: Product[];
+  ads: Ad[];
   initialQuery?: string;
   subcategory?: string;
   sort?: string;
@@ -55,6 +58,8 @@ export default function ProductCatalog({
       </form>
 
       {children}
+
+      <AdsCarousel ads={ads} />
 
       {visibleProducts.length === 0 ? (
         <p className="mt-10 text-gray-500">
