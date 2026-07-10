@@ -12,6 +12,7 @@ export type Product = {
 export type CategoryWithSubcategories = {
   id: number;
   name: string;
+  image_url?: string | null;
   subcategories: { id: number; name: string }[];
 };
 

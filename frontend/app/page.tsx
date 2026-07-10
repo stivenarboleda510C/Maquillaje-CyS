@@ -3,6 +3,7 @@ import { getAds, getCategories, getProducts } from "@/lib/api";
 import ProductCatalog from "@/components/ProductCatalog";
 
 type Filters = {
+  category?: string;
   subcategory?: string;
   q?: string;
   sort?: string;
@@ -11,6 +12,7 @@ type Filters = {
 function buildQuery(filters: Filters, overrides: Filters) {
   const merged = { ...filters, ...overrides };
   const params = new URLSearchParams();
+  if (merged.category) params.set("category", merged.category);
   if (merged.subcategory) params.set("subcategory", merged.subcategory);
   if (merged.q) params.set("q", merged.q);
   if (merged.sort) params.set("sort", merged.sort);
@@ -21,20 +23,28 @@ function buildQuery(filters: Filters, overrides: Filters) {
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ subcategory?: string; q?: string; sort?: string }>;
+  searchParams: Promise<{
+    category?: string;
+    subcategory?: string;
+    q?: string;
+    sort?: string;
+  }>;
 }) {
-  const { subcategory, q, sort } = await searchParams;
-  const filters: Filters = { subcategory, q, sort };
+  const { category, subcategory, q, sort } = await searchParams;
+  const filters: Filters = { category, subcategory, q, sort };
 
   const [products, categories, ads] = await Promise.all([
-    getProducts({ subcategory, search: q, sort }),
+    getProducts({ category, subcategory, search: q, sort }),
     getCategories(),
     getAds(),
   ]);
 
-  const subcategoryNames = Array.from(
-    new Set(categories.flatMap((c) => c.subcategories.map((s) => s.name)))
-  ).sort();
+  const selectedCategory = categories.find((c) => c.name === category);
+  const subcategoryNames = selectedCategory
+    ? selectedCategory.subcategories.map((s) => s.name).sort()
+    : Array.from(
+        new Set(categories.flatMap((c) => c.subcategories.map((s) => s.name)))
+      ).sort();
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
@@ -48,6 +58,8 @@ export default async function Page({
       <ProductCatalog
         products={products}
         ads={ads}
+        categories={categories}
+        category={category}
         initialQuery={q}
         subcategory={subcategory}
         sort={sort}

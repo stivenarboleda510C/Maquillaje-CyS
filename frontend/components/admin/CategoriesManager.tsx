@@ -2,9 +2,56 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import type { CategoryWithSubcategories } from "@/lib/api";
 import IconButton from "@/components/admin/IconButton";
+
+async function uploadCategoryImage(file: File): Promise<string> {
+  const supabase = createClient();
+  const path = `${Date.now()}-${file.name}`;
+  const { error: uploadError } = await supabase.storage
+    .from("category-images")
+    .upload(path, file);
+
+  if (uploadError) {
+    throw new Error("No se pudo subir la imagen: " + uploadError.message);
+  }
+
+  const { data } = supabase.storage.from("category-images").getPublicUrl(path);
+  return data.publicUrl;
+}
+
+function CategoryThumbnail({
+  category,
+  size = 40,
+}: {
+  category: CategoryWithSubcategories;
+  size?: number;
+}) {
+  if (category.image_url) {
+    return (
+      <div
+        className="relative shrink-0 overflow-hidden rounded-full bg-pink-50"
+        style={{ width: size, height: size }}
+      >
+        <Image src={category.image_url} alt={category.name} fill className="object-cover" />
+      </div>
+    );
+  }
+  return (
+    <div
+      className="flex shrink-0 items-center justify-center rounded-full font-bold text-white"
+      style={{
+        width: size,
+        height: size,
+        background: "linear-gradient(135deg, #ec4899 0%, #2dd4bf 100%)",
+      }}
+    >
+      {category.name.charAt(0).toUpperCase()}
+    </div>
+  );
+}
 
 export default function CategoriesManager({
   categories,
@@ -16,6 +63,7 @@ export default function CategoriesManager({
     categories[0]?.id ?? null
   );
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategoryImage, setNewCategoryImage] = useState<File | null>(null);
   const [newSubcategoryName, setNewSubcategoryName] = useState("");
   const [editingCategoryId, setEditingCategoryId] = useState<number | null>(
     null
@@ -25,6 +73,9 @@ export default function CategoriesManager({
   >(null);
   const [editName, setEditName] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [uploadingImageId, setUploadingImageId] = useState<number | null>(
+    null
+  );
 
   const selectedCategory =
     categories.find((c) => c.id === selectedId) ?? null;
@@ -34,17 +85,51 @@ export default function CategoriesManager({
     if (!newCategoryName.trim()) return;
     setError(null);
 
+    let imageUrl: string | null = null;
+    if (newCategoryImage) {
+      try {
+        imageUrl = await uploadCategoryImage(newCategoryImage);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Error desconocido");
+        return;
+      }
+    }
+
     const supabase = createClient();
     const { error: insertError } = await supabase
       .from("categories")
-      .insert({ name: newCategoryName.trim() });
+      .insert({ name: newCategoryName.trim(), image_url: imageUrl });
 
     if (insertError) {
       setError("No se pudo crear la categoria: " + insertError.message);
       return;
     }
     setNewCategoryName("");
+    setNewCategoryImage(null);
     router.refresh();
+  }
+
+  async function handleChangeCategoryImage(categoryId: number, file: File) {
+    setUploadingImageId(categoryId);
+    setError(null);
+    try {
+      const imageUrl = await uploadCategoryImage(file);
+      const supabase = createClient();
+      const { error: updateError } = await supabase
+        .from("categories")
+        .update({ image_url: imageUrl })
+        .eq("id", categoryId);
+
+      if (updateError) {
+        setError("No se pudo actualizar la imagen: " + updateError.message);
+        return;
+      }
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error desconocido");
+    } finally {
+      setUploadingImageId(null);
+    }
   }
 
   async function handleRenameCategory(id: number) {
@@ -164,33 +249,57 @@ export default function CategoriesManager({
               <li
                 key={category.id}
                 onClick={() => setSelectedId(category.id)}
-                className={`flex cursor-pointer items-center justify-between border-b border-gray-50 px-5 py-3.5 ${
+                className={`flex cursor-pointer items-center justify-between gap-3 border-b border-gray-50 px-5 py-3.5 ${
                   selectedId === category.id ? "bg-pink-50" : "hover:bg-gray-50"
                 }`}
               >
-                {editingCategoryId === category.id ? (
-                  <input
-                    value={editName}
-                    onChange={(e) => setEditName(e.target.value)}
+                <div className="flex flex-1 items-center gap-3">
+                  <label
                     onClick={(e) => e.stopPropagation()}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") handleRenameCategory(category.id);
-                      if (e.key === "Escape") setEditingCategoryId(null);
-                    }}
-                    autoFocus
-                    className="flex-1 rounded-md border border-gray-300 px-2 py-1 text-sm"
-                  />
-                ) : (
-                  <span
-                    className={`text-sm ${
-                      selectedId === category.id
-                        ? "font-semibold text-pink-600"
-                        : "text-gray-700"
-                    }`}
+                    className="relative cursor-pointer"
+                    title="Cambiar imagen"
                   >
-                    {category.name}
-                  </span>
-                )}
+                    <CategoryThumbnail category={category} />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleChangeCategoryImage(category.id, file);
+                      }}
+                    />
+                    {uploadingImageId === category.id ? (
+                      <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 text-[10px] text-white">
+                        ...
+                      </span>
+                    ) : null}
+                  </label>
+
+                  {editingCategoryId === category.id ? (
+                    <input
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleRenameCategory(category.id);
+                        if (e.key === "Escape") setEditingCategoryId(null);
+                      }}
+                      autoFocus
+                      className="flex-1 rounded-md border border-gray-300 px-2 py-1 text-sm"
+                    />
+                  ) : (
+                    <span
+                      className={`text-sm ${
+                        selectedId === category.id
+                          ? "font-semibold text-pink-600"
+                          : "text-gray-700"
+                      }`}
+                    >
+                      {category.name}
+                    </span>
+                  )}
+                </div>
 
                 <div className="flex items-center gap-2">
                   {editingCategoryId === category.id ? (
@@ -226,13 +335,19 @@ export default function CategoriesManager({
 
           <form
             onSubmit={handleCreateCategory}
-            className="flex gap-2 border-t border-gray-100 p-4"
+            className="flex flex-wrap gap-2 border-t border-gray-100 p-4"
           >
             <input
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
               placeholder="Nueva categoria"
               className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm"
+            />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setNewCategoryImage(e.target.files?.[0] ?? null)}
+              className="w-full text-xs text-gray-500 sm:w-auto"
             />
             <button
               type="submit"

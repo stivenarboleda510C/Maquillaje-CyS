@@ -3,11 +3,14 @@
 import { useMemo, useState } from "react";
 import ProductCard from "@/components/ProductCard";
 import AdsCarousel from "@/components/AdsCarousel";
-import type { Ad, Product } from "@/lib/api";
+import CategoryIcons from "@/components/CategoryIcons";
+import type { Ad, CategoryWithSubcategories, Product } from "@/lib/api";
 
 export default function ProductCatalog({
   products,
   ads,
+  categories,
+  category,
   initialQuery,
   subcategory,
   sort,
@@ -15,6 +18,8 @@ export default function ProductCatalog({
 }: {
   products: Product[];
   ads: Ad[];
+  categories: CategoryWithSubcategories[];
+  category?: string;
   initialQuery?: string;
   subcategory?: string;
   sort?: string;
@@ -37,6 +42,9 @@ export default function ProductCatalog({
         action="/"
         className="mt-6 flex max-w-md items-center gap-2"
       >
+        {category ? (
+          <input type="hidden" name="category" value={category} />
+        ) : null}
         {subcategory ? (
           <input type="hidden" name="subcategory" value={subcategory} />
         ) : null}
@@ -60,6 +68,8 @@ export default function ProductCatalog({
       {children}
 
       <AdsCarousel ads={ads} />
+
+      <CategoryIcons categories={categories} selected={category} />
 
       {visibleProducts.length === 0 ? (
         <p className="mt-10 text-gray-500">

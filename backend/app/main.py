@@ -77,7 +77,7 @@ def get_product(product_id: int):
 def list_categories():
     result = (
         supabase.table("categories")
-        .select("id, name, subcategories(id, name)")
+        .select("id, name, image_url, subcategories(id, name)")
         .order("name")
         .execute()
     )
