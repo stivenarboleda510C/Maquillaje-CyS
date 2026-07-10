@@ -69,7 +69,9 @@ export default function ProductCatalog({
 
       <AdsCarousel ads={ads} />
 
-      <CategoryIcons categories={categories} selected={category} />
+      {!category ? (
+        <CategoryIcons categories={categories} selected={category} />
+      ) : null}
 
       {visibleProducts.length === 0 ? (
         <p className="mt-10 text-gray-500">
