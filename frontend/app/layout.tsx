@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Header from "@/components/Header";
 import WhatsappButton from "@/components/WhatsappButton";
 import AuthHashRedirect from "@/components/AuthHashRedirect";
+import AnnouncementBar from "@/components/AnnouncementBar";
+import Footer from "@/components/Footer";
 import { CartProvider } from "@/lib/cart/CartContext";
 import "./globals.css";
 
@@ -34,8 +36,10 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-pink-50/40">
         <AuthHashRedirect />
         <CartProvider>
+          <AnnouncementBar />
           <Header />
           <main className="flex-1">{children}</main>
+          <Footer />
           <WhatsappButton />
         </CartProvider>
       </body>

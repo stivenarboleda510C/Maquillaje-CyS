@@ -12,17 +12,17 @@ export default function SubcategoryIcons({
   if (subcategories.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap justify-center gap-5">
+    <div className="flex justify-center gap-4 overflow-x-auto px-2 pb-2">
       {subcategories.map((sub) => {
         const isSelected = selected === sub.name;
         return (
           <Link
             key={sub.id}
             href={`/?category=${encodeURIComponent(category)}&subcategory=${encodeURIComponent(sub.name)}`}
-            className="flex flex-col items-center gap-2"
+            className="flex shrink-0 flex-col items-center gap-1.5"
           >
             <div
-              className={`flex h-32 w-32 items-center justify-center rounded-full text-2xl font-bold text-white ${
+              className={`flex h-14 w-14 items-center justify-center rounded-full text-base font-bold text-white ${
                 isSelected ? "ring-2 ring-pink-600" : ""
               }`}
               style={{
@@ -32,7 +32,7 @@ export default function SubcategoryIcons({
               {sub.name.charAt(0).toUpperCase()}
             </div>
             <span
-              className={`text-sm font-medium ${
+              className={`text-xs font-medium ${
                 isSelected ? "text-pink-600" : "text-gray-700"
               }`}
             >
