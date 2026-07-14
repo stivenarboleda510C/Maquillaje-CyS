@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Maquillaje CyS",
+  title: "Makeup Pinklu",
   description: "Catalogo de productos de maquillaje",
 };
 

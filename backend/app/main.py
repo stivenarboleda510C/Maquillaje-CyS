@@ -29,12 +29,20 @@ def root():
 def _flatten_category_fields(product: dict) -> dict:
     category = product.get("category")
     subcategory = product.get("subcategory")
+    images = product.get("images") or []
     product["category"] = category["name"] if category else None
     product["subcategory"] = subcategory["name"] if subcategory else None
+    product["images"] = [
+        img["image_url"]
+        for img in sorted(images, key=lambda img: img["sort_order"])
+    ]
     return product
 
 
-PRODUCT_SELECT = "*, category:categories(name), subcategory:subcategories(name)"
+PRODUCT_SELECT = (
+    "*, category:categories(name), subcategory:subcategories(name),"
+    " images:product_images(image_url, sort_order)"
+)
 
 
 @app.get("/products", response_model=list[Product])

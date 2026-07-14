@@ -82,7 +82,7 @@ export default function CompleteSignupPage() {
     <div className="mx-auto flex max-w-sm flex-col justify-center px-6 py-20">
       <Logo />
       <h1 className="mt-6 text-2xl font-bold text-gray-900">
-        Bienvenido a Maquillaje CyS
+        Bienvenido a Makeup Pinklu
       </h1>
 
       {status === "loading" ? (

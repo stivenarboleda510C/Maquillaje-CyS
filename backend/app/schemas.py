@@ -8,7 +8,7 @@ class Product(BaseModel):
     name: str
     description: Optional[str] = None
     price: float
-    image_url: Optional[str] = None
+    images: list[str] = []
     category: Optional[str] = None
     subcategory: Optional[str] = None
     stock: int = 0

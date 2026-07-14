@@ -2,8 +2,17 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import type { CategoryWithSubcategories, Product } from "@/lib/api";
+
+const MAX_IMAGES = 6;
+
+type GalleryImage = {
+  key: string;
+  url: string;
+  file?: File;
+};
 
 export default function ProductForm({
   product,
@@ -17,7 +26,9 @@ export default function ProductForm({
   const [description, setDescription] = useState(product?.description ?? "");
   const [price, setPrice] = useState(product?.price?.toString() ?? "");
   const [stock, setStock] = useState(product?.stock?.toString() ?? "0");
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [images, setImages] = useState<GalleryImage[]>(
+    (product?.images ?? []).map((url) => ({ key: url, url }))
+  );
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -34,30 +45,55 @@ export default function ProductForm({
 
   const selectedCategory = categories.find((c) => String(c.id) === categoryId);
 
+  function handleAddFiles(fileList: FileList | null) {
+    if (!fileList) return;
+    const room = MAX_IMAGES - images.length;
+    const files = Array.from(fileList).slice(0, room);
+    const newImages = files.map((file) => ({
+      key: `${file.name}-${file.lastModified}-${Math.random()}`,
+      url: URL.createObjectURL(file),
+      file,
+    }));
+    setImages((current) => [...current, ...newImages]);
+  }
+
+  function handleRemoveImage(key: string) {
+    setImages((current) => current.filter((img) => img.key !== key));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
     setError(null);
 
+    if (images.length === 0) {
+      setError("Sube al menos una foto del producto.");
+      return;
+    }
+
+    setLoading(true);
     const supabase = createClient();
-    let imageUrl = product?.image_url ?? null;
 
-    if (imageFile) {
-      const path = `${Date.now()}-${imageFile.name}`;
-      const { error: uploadError } = await supabase.storage
-        .from("product-images")
-        .upload(path, imageFile);
+    const finalUrls: string[] = [];
+    for (const img of images) {
+      if (img.file) {
+        const path = `${Date.now()}-${img.file.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from("product-images")
+          .upload(path, img.file);
 
-      if (uploadError) {
-        setError("No se pudo subir la imagen: " + uploadError.message);
-        setLoading(false);
-        return;
+        if (uploadError) {
+          setError("No se pudo subir una imagen: " + uploadError.message);
+          setLoading(false);
+          return;
+        }
+
+        const { data } = supabase.storage
+          .from("product-images")
+          .getPublicUrl(path);
+        finalUrls.push(data.publicUrl);
+      } else {
+        finalUrls.push(img.url);
       }
-
-      const { data } = supabase.storage
-        .from("product-images")
-        .getPublicUrl(path);
-      imageUrl = data.publicUrl;
     }
 
     const payload = {
@@ -67,15 +103,51 @@ export default function ProductForm({
       category_id: categoryId ? parseInt(categoryId, 10) : null,
       subcategory_id: subcategoryId ? parseInt(subcategoryId, 10) : null,
       stock: parseInt(stock, 10),
-      image_url: imageUrl,
     };
 
-    const { error: saveError } = product
-      ? await supabase.from("products").update(payload).eq("id", product.id)
-      : await supabase.from("products").insert(payload);
+    let productId = product?.id;
 
-    if (saveError) {
-      setError("No se pudo guardar el producto: " + saveError.message);
+    if (productId) {
+      const { error: updateError } = await supabase
+        .from("products")
+        .update(payload)
+        .eq("id", productId);
+
+      if (updateError) {
+        setError("No se pudo guardar el producto: " + updateError.message);
+        setLoading(false);
+        return;
+      }
+
+      await supabase.from("product_images").delete().eq("product_id", productId);
+    } else {
+      const { data: inserted, error: insertError } = await supabase
+        .from("products")
+        .insert(payload)
+        .select()
+        .single();
+
+      if (insertError || !inserted) {
+        setError(
+          "No se pudo guardar el producto: " +
+            (insertError?.message ?? "error desconocido")
+        );
+        setLoading(false);
+        return;
+      }
+      productId = inserted.id;
+    }
+
+    const { error: imagesError } = await supabase.from("product_images").insert(
+      finalUrls.map((url, index) => ({
+        product_id: productId,
+        image_url: url,
+        sort_order: index,
+      }))
+    );
+
+    if (imagesError) {
+      setError("No se pudieron guardar las fotos: " + imagesError.message);
       setLoading(false);
       return;
     }
@@ -181,19 +253,52 @@ export default function ProductForm({
 
       <div>
         <label className="text-sm font-medium text-gray-700">
-          Foto del producto
+          Fotos del producto ({images.length}/{MAX_IMAGES}) - minimo 1
         </label>
-        {product?.image_url ? (
-          <p className="mt-1 text-xs text-gray-500">
-            Ya tiene una foto. Sube una nueva solo si quieres reemplazarla.
-          </p>
+
+        {images.length > 0 ? (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {images.map((img) => (
+              <div
+                key={img.key}
+                className="relative h-20 w-20 overflow-hidden rounded-md border border-gray-200 bg-pink-50"
+              >
+                <Image
+                  src={img.url}
+                  alt={name || "Producto"}
+                  fill
+                  unoptimized={Boolean(img.file)}
+                  className="object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImage(img.key)}
+                  aria-label="Quitar foto"
+                  className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-xs text-white hover:bg-black/80"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
         ) : null}
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
-          className="mt-1 w-full text-sm"
-        />
+
+        {images.length < MAX_IMAGES ? (
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => {
+              handleAddFiles(e.target.files);
+              e.target.value = "";
+            }}
+            className="mt-2 w-full text-sm"
+          />
+        ) : (
+          <p className="mt-2 text-xs text-gray-500">
+            Ya tienes el maximo de {MAX_IMAGES} fotos.
+          </p>
+        )}
       </div>
 
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
