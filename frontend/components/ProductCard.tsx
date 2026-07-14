@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/lib/api";
 import QuickViewModal from "@/components/QuickViewModal";
+import { formatPrice } from "@/lib/formatPrice";
 
 function EyeIcon() {
   return (
@@ -59,7 +60,7 @@ export default function ProductCard({ product }: { product: Product }) {
           ) : null}
           <h2 className="font-semibold text-gray-900">{product.name}</h2>
           <p className="mt-auto text-lg font-bold text-gray-900">
-            ${product.price.toFixed(2)}
+            {formatPrice(product.price)}
           </p>
         </div>
       </Link>

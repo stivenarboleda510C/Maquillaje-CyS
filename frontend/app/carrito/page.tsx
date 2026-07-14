@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/lib/cart/CartContext";
+import { formatPrice } from "@/lib/formatPrice";
 
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
 
@@ -17,9 +18,9 @@ export default function CartPage() {
   function buildWhatsappLink() {
     const lines = items.map(
       (item) =>
-        `${item.quantity}x ${item.product.name} - $${(
+        `${item.quantity}x ${item.product.name} - ${formatPrice(
           item.product.price * item.quantity
-        ).toFixed(2)}`
+        )}`
     );
 
     const message = [
@@ -27,7 +28,7 @@ export default function CartPage() {
       "",
       ...lines,
       "",
-      `Total: $${subtotal.toFixed(2)}`,
+      `Total: ${formatPrice(subtotal)}`,
       "",
       `Nombre: ${name}`,
       `Telefono: ${phone}`,
@@ -79,7 +80,7 @@ export default function CartPage() {
             <div className="flex-1">
               <p className="font-medium text-gray-900">{item.product.name}</p>
               <p className="text-sm text-gray-500">
-                ${item.product.price.toFixed(2)} c/u
+                {formatPrice(item.product.price)} c/u
               </p>
             </div>
             <div className="flex items-center rounded-full border border-gray-300">
@@ -104,7 +105,7 @@ export default function CartPage() {
               </button>
             </div>
             <p className="w-20 text-right font-semibold text-gray-900">
-              ${(item.product.price * item.quantity).toFixed(2)}
+              {formatPrice(item.product.price * item.quantity)}
             </p>
             <button
               type="button"
@@ -118,7 +119,7 @@ export default function CartPage() {
       </div>
 
       <div className="mt-6 flex justify-end text-xl font-bold text-gray-900">
-        Total: ${subtotal.toFixed(2)}
+        Total: {formatPrice(subtotal)}
       </div>
 
       <div className="mt-10 rounded-xl border border-gray-200 bg-white p-6">

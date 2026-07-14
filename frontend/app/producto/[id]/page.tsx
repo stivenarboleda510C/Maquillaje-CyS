@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getProduct } from "@/lib/api";
 import AddToCartButton from "@/components/AddToCartButton";
 import ProductGallery from "@/components/ProductGallery";
+import { formatPrice } from "@/lib/formatPrice";
 
 export default async function Page({
   params,
@@ -27,7 +28,7 @@ export default async function Page({
             {product.name}
           </h1>
           <p className="mt-4 text-2xl font-bold text-gray-900">
-            ${product.price.toFixed(2)}
+            {formatPrice(product.price)}
           </p>
           {product.description ? (
             <p className="mt-4 text-gray-600">{product.description}</p>

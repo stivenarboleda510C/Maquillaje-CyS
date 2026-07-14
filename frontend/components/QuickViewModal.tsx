@@ -3,6 +3,7 @@
 import type { Product } from "@/lib/api";
 import ProductGallery from "@/components/ProductGallery";
 import AddToCartButton from "@/components/AddToCartButton";
+import { formatPrice } from "@/lib/formatPrice";
 
 export default function QuickViewModal({
   product,
@@ -41,7 +42,7 @@ export default function QuickViewModal({
               {product.name}
             </h2>
             <p className="mt-3 text-2xl font-bold text-gray-900">
-              ${product.price.toFixed(2)}
+              {formatPrice(product.price)}
             </p>
             {product.description ? (
               <p className="mt-3 text-gray-600">{product.description}</p>

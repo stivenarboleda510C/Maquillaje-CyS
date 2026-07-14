@@ -3,6 +3,7 @@ import Image from "next/image";
 import { getProducts } from "@/lib/api";
 import DeleteProductButton from "@/components/admin/DeleteProductButton";
 import { EditIcon, iconButtonClass } from "@/components/admin/IconButton";
+import { formatPrice } from "@/lib/formatPrice";
 
 export default async function AdminProductsPage() {
   const products = await getProducts();
@@ -54,7 +55,7 @@ export default async function AdminProductsPage() {
                   {product.subcategory ? ` > ${product.subcategory}` : ""}
                 </td>
                 <td className="px-4 py-3 text-gray-600">
-                  ${product.price.toFixed(2)}
+                  {formatPrice(product.price)}
                 </td>
                 <td className="px-4 py-3 text-gray-600">{product.stock}</td>
                 <td className="px-4 py-3">
