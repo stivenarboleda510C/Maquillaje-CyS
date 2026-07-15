@@ -1,87 +1,77 @@
 import Link from "next/link";
-import Image from "next/image";
-import { getProducts } from "@/lib/api";
-import DeleteProductButton from "@/components/admin/DeleteProductButton";
-import { EditIcon, iconButtonClass } from "@/components/admin/IconButton";
+import { getAds, getProducts } from "@/lib/api";
+import { createClient } from "@/lib/supabase/server";
 import { formatPrice } from "@/lib/formatPrice";
 
-export default async function AdminProductsPage() {
-  const products = await getProducts();
+export default async function AdminDashboardPage() {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getUser();
+  const role = (data.user?.app_metadata?.role as string) ?? "empleado";
+
+  const [products, ads] = await Promise.all([getProducts(), getAds()]);
+
+  let totalRevenue = 0;
+  let salesCount = 0;
+  if (role === "admin") {
+    const { data: sales } = await supabase
+      .from("sales")
+      .select("quantity, unit_price");
+    if (sales) {
+      salesCount = sales.length;
+      totalRevenue = sales.reduce(
+        (sum, s) => sum + s.quantity * s.unit_price,
+        0
+      );
+    }
+  }
+
+  const cards: { label: string; value: string | number; href: string }[] = [
+    {
+      label: "Productos publicados",
+      value: products.length,
+      href: "/admin/productos",
+    },
+    {
+      label: "Banners de publicidad",
+      value: ads.length,
+      href: "/admin/publicidad",
+    },
+    ...(role === "admin"
+      ? [
+          {
+            label: "Dinero en ventas",
+            value: formatPrice(totalRevenue),
+            href: "/admin/dinero",
+          },
+          {
+            label: "Cantidad de ventas",
+            value: salesCount,
+            href: "/admin/dinero",
+          },
+        ]
+      : []),
+  ];
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Productos</h1>
-        <Link
-          href="/admin/productos/nuevo"
-          className="rounded-full bg-pink-600 px-4 py-2 text-sm font-semibold text-white"
-        >
-          Nuevo producto
-        </Link>
-      </div>
+      <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+      <p className="mt-1 text-sm text-gray-600">
+        Resumen general de tu tienda.
+      </p>
 
-      <div className="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-gray-200 bg-gray-50 text-gray-600">
-            <tr>
-              <th className="px-4 py-3">Foto</th>
-              <th className="px-4 py-3">Nombre</th>
-              <th className="px-4 py-3">Categoria</th>
-              <th className="px-4 py-3">Precio</th>
-              <th className="px-4 py-3">Stock</th>
-              <th className="px-4 py-3"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product) => (
-              <tr key={product.id} className="border-b border-gray-100">
-                <td className="px-4 py-3">
-                  {product.images[0] ? (
-                    <div className="relative h-12 w-12 overflow-hidden rounded-md bg-pink-50">
-                      <Image
-                        src={product.images[0]}
-                        alt={product.name}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  ) : null}
-                </td>
-                <td className="px-4 py-3 font-medium text-gray-900">
-                  {product.name}
-                </td>
-                <td className="px-4 py-3 text-gray-600">
-                  {product.category ?? "-"}
-                  {product.subcategory ? ` > ${product.subcategory}` : ""}
-                </td>
-                <td className="px-4 py-3 text-gray-600">
-                  {formatPrice(product.price)}
-                </td>
-                <td className="px-4 py-3 text-gray-600">{product.stock}</td>
-                <td className="px-4 py-3">
-                  <div className="flex items-center justify-end gap-2">
-                    <Link
-                      href={`/admin/productos/${product.id}/editar`}
-                      aria-label="Editar producto"
-                      className={iconButtonClass("edit")}
-                    >
-                      <EditIcon />
-                    </Link>
-                    <DeleteProductButton
-                      productId={product.id}
-                      productName={product.name}
-                    />
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {products.length === 0 ? (
-          <p className="px-4 py-6 text-center text-gray-500">
-            Todavia no hay productos.
-          </p>
-        ) : null}
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {cards.map((card) => (
+          <Link
+            key={card.label}
+            href={card.href}
+            className="rounded-xl border border-gray-200 bg-white p-5 transition hover:shadow-md"
+          >
+            <p className="text-sm text-gray-500">{card.label}</p>
+            <p className="mt-2 text-3xl font-bold text-gray-900">
+              {card.value}
+            </p>
+          </Link>
+        ))}
       </div>
     </div>
   );

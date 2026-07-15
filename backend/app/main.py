@@ -59,6 +59,8 @@ def list_products(
         query = query.order("price")
     elif sort == "price_desc":
         query = query.order("price", desc=True)
+    else:
+        query = query.order("sort_order")
     result = query.execute()
     products = [_flatten_category_fields(p) for p in result.data]
     if category:

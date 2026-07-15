@@ -152,7 +152,7 @@ export default function ProductForm({
       return;
     }
 
-    router.push("/admin");
+    router.push("/admin/productos");
     router.refresh();
   }
 

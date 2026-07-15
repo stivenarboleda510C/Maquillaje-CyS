@@ -19,11 +19,15 @@ export default function AdminSidebar({ role }: { role: string }) {
   }
 
   const navItems = [
-    { href: "/admin", label: "Productos" },
+    { href: "/admin", label: "Dashboard" },
+    { href: "/admin/productos", label: "Productos" },
     { href: "/admin/categorias", label: "Categorias" },
     { href: "/admin/publicidad", label: "Publicidad" },
     ...(role === "admin"
-      ? [{ href: "/admin/usuarios", label: "Usuarios" }]
+      ? [
+          { href: "/admin/dinero", label: "Dinero" },
+          { href: "/admin/usuarios", label: "Usuarios" },
+        ]
       : []),
   ];
 
