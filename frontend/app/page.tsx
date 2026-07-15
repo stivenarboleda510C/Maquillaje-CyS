@@ -59,9 +59,6 @@ export default async function Page({
         ads={ads}
         categories={categories}
         category={category}
-        initialQuery={q}
-        subcategory={subcategory}
-        sort={sort}
       >
         {selectedCategory ? (
           <div className="mt-6">

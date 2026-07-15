@@ -11,7 +11,7 @@ export default function Logo({ className = "" }: { className?: string }) {
         className="h-12 w-12 rounded-full object-cover"
         priority
       />
-      <span className="text-xl font-bold leading-none text-gray-900">
+      <span className="text-xl font-bold uppercase leading-none text-gray-900">
         Makeup <span className="text-pink-600">PINKLu</span>
       </span>
     </span>

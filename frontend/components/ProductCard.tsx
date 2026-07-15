@@ -6,6 +6,7 @@ import Link from "next/link";
 import type { Product } from "@/lib/api";
 import QuickViewModal from "@/components/QuickViewModal";
 import { formatPrice } from "@/lib/formatPrice";
+import { useCart } from "@/lib/cart/CartContext";
 
 function EyeIcon() {
   return (
@@ -21,8 +22,18 @@ function EyeIcon() {
 }
 
 export default function ProductCard({ product }: { product: Product }) {
+  const { addItem } = useCart();
   const [showQuickView, setShowQuickView] = useState(false);
+  const [added, setAdded] = useState(false);
   const cover = product.images[0];
+
+  function handleAddToCart(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    addItem(product, 1);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
+  }
 
   return (
     <>
@@ -62,6 +73,15 @@ export default function ProductCard({ product }: { product: Product }) {
           <p className="mt-auto text-lg font-bold text-gray-900">
             {formatPrice(product.price)}
           </p>
+          {product.stock > 0 ? (
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              className="mt-2 w-full rounded-full bg-pink-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-pink-700"
+            >
+              {added ? "Agregado!" : "Agregar al carrito"}
+            </button>
+          ) : null}
         </div>
       </Link>
 

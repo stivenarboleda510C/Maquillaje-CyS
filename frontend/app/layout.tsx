@@ -6,6 +6,7 @@ import AuthHashRedirect from "@/components/AuthHashRedirect";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import Footer from "@/components/Footer";
 import { CartProvider } from "@/lib/cart/CartContext";
+import { SearchProvider } from "@/lib/search/SearchContext";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -35,13 +36,15 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-pink-50/40">
         <AuthHashRedirect />
-        <CartProvider>
-          <AnnouncementBar />
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-          <WhatsappButton />
-        </CartProvider>
+        <SearchProvider>
+          <CartProvider>
+            <AnnouncementBar />
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <WhatsappButton />
+          </CartProvider>
+        </SearchProvider>
       </body>
     </html>
   );
